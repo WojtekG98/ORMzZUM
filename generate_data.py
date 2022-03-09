@@ -34,5 +34,5 @@ def training_data(file):
         vel_1 = rows_1[1]
         vel_mean = vel_0+vel_1/2
         data.append([lengths_diff, vel_mean])
-    print(len(rows), len(data))
+    # print(len(rows), len(data))
     return data
