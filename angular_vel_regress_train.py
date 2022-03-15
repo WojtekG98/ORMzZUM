@@ -30,7 +30,7 @@ def build_and_compile_model(norm):
 
 
 # load the data
-data = training_data('raw_data/lin_09_03_2022_16_40_34.csv')
+data = training_data('raw_data/ang_09_03_2022_16_40_34.csv')
 X = []
 Y = []
 for features, label in data:
@@ -50,4 +50,14 @@ his = model.fit(X_train,
                 epochs=100)
 model.summary()
 plot_loss(his)
-model.save('linear_vel_regress.model')
+model.save('angular_vel_regress.model')
+
+test_data = training_data('raw_data/ang_02_03_2022_14_34_06.csv')
+X_test = []
+Y_test = []
+for features, label in test_data:
+    X_test.append(features)
+    Y_test.append(label)
+ans = model.predict(X_test)
+for i in range(0, len(ans)):
+    print(ans[i], Y_test[i])
