@@ -1,4 +1,5 @@
 import csv
+import numpy as np
 
 
 def training_data(file):
@@ -22,11 +23,14 @@ def training_data(file):
     if len(rows) % 2 != 0:
         rows.pop()
     data = []
+    f = open("data/tmp.csv", "a")
+
     for i in range(0, int(len(rows)/2)):
         rows_0 = rows[2*i]
         rows_1 = rows[2*i+1]
         lengths_0 = rows_0[0]
         lengths_1 = rows_1[0]
+        #rolled_lengths_1 = array_new = np.roll(lengths_1, 360)
         lengths_diff =[]
         for j in range(0, len(lengths_0)):
             lengths_diff.append(lengths_1[j]-lengths_0[j])
@@ -34,5 +38,9 @@ def training_data(file):
         vel_1 = rows_1[1]
         vel_mean = vel_0+vel_1/2
         data.append([lengths_diff, vel_mean])
-    # print(len(rows), len(data))
+        list_to_str = ', '.join(map(str, lengths_diff))
+        tofile = str(vel_mean) + ", (" + list_to_str + ")\n"
+        f.write(tofile)
+    print(len(rows), len(data))
+    f.close()
     return data
