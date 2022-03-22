@@ -3,9 +3,10 @@ import matplotlib.pyplot as plt
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras import regularizers
-from generate_data import training_data
 
 vel = "linear"
+
+
 # vel = "angular"
 
 
@@ -17,15 +18,16 @@ def plot_loss(history):
     plt.legend()
     plt.grid(True)
     plt.show()
+    print(history.history)
 
 
 def build_and_compile_model(norm):
     model = keras.Sequential([
         norm,
         layers.Dense(16, kernel_regularizer=regularizers.l2(0.0001), activation='relu'),
-        layers.Dropout(0.5),
+        #        layers.Dropout(0.5),
         layers.Dense(8, kernel_regularizer=regularizers.l2(0.0001), activation='relu'),
-        layers.Dropout(0.5),
+        #        layers.Dropout(0.5),
         layers.Dense(1, activation="linear")
     ])
     model.compile(loss='mean_absolute_percentage_error',
@@ -34,8 +36,8 @@ def build_and_compile_model(norm):
 
 
 # load the data
-data = training_data('raw_data/lin_09_03_2022_16_40_34.csv')
-#data = training_data('raw_data/ang_09_03_2022_16_40_34.csv')
+filename = 'lin_22_03_2022_18_27_55'
+data = np.load('data/train_' + filename + '.npy', allow_pickle=True)
 X = []
 Y = []
 for features, label in data:
@@ -49,7 +51,7 @@ model = build_and_compile_model(layers.Normalization(axis=-1))
 
 his = model.fit(X_train,
                 Y_train,
-                validation_split=0.4,
+                validation_split=0.2,
                 epochs=50)
 model.summary()
 plot_loss(his)
