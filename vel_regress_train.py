@@ -11,10 +11,11 @@ vel = "linear"
 
 
 def plot_loss(history):
+    plt.figure()
     plt.plot(history.history['loss'], label='loss')
     plt.plot(history.history['val_loss'], label='val_loss')
     plt.xlabel('Epoch')
-    plt.ylabel('Error [MAPE]')
+    plt.ylabel('Error [MAE]')
     plt.legend()
     plt.grid(True)
     plt.show()
@@ -24,14 +25,15 @@ def plot_loss(history):
 def build_and_compile_model(norm):
     model = keras.Sequential([
         norm,
-        layers.Dense(16, kernel_regularizer=regularizers.l2(0.0001), activation='relu'),
-        #        layers.Dropout(0.5),
-        layers.Dense(8, kernel_regularizer=regularizers.l2(0.0001), activation='relu'),
-        #        layers.Dropout(0.5),
+        layers.Dense(4, activation='relu'),  # kernel_regularizer=regularizers.l2(0.0001),
+        # layers.Dropout(0.1),
+        layers.Dense(12, activation='relu'),
+        layers.Dense(4, activation='relu'),
         layers.Dense(1, activation="linear")
     ])
-    model.compile(loss='mean_absolute_percentage_error',
-                  optimizer="adam")
+    model.compile(loss="mean_squared_error",
+                  optimizer="adam",
+                  metrics=[keras.metrics.MeanSquaredError(), keras.metrics.MeanAbsoluteError()])
     return model
 
 
@@ -52,7 +54,7 @@ model = build_and_compile_model(layers.Normalization(axis=-1))
 his = model.fit(X_train,
                 Y_train,
                 validation_split=0.2,
-                epochs=50)
+                epochs=5000)
 model.summary()
 plot_loss(his)
 model.save(vel + "_vel_regress.model")
