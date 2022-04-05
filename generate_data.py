@@ -54,6 +54,8 @@ if __name__ == "__main__":
     np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
     test_data = np.array(data[4 * len(data) // 5:])
     train_data = np.array(data[:4 * len(data) // 5])
+    np.save('data/train_' + filename, train_data)
+    np.save('data/test_' + filename, test_data)
     n = 8
     i = [x for x in range(0, N, int(N / n))]
     test_data_8 = []
@@ -64,5 +66,5 @@ if __name__ == "__main__":
     for item in test_data:
         x = [item[0][index] for index in i]
         test_data_8.append((x, item[1]))
-    np.save('data/train_' + filename, train_data_8)
-    np.save('data/test_' + filename, test_data_8)
+    np.save('data/8train_' + filename, train_data_8)
+    np.save('data/8test_' + filename, test_data_8)

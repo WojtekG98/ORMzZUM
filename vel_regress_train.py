@@ -27,19 +27,22 @@ def build_and_compile_model(norm):
         norm,
         layers.Dense(4, activation='relu'),  # kernel_regularizer=regularizers.l2(0.0001),
         # layers.Dropout(0.1),
+        #layers.BatchNormalization(),
         layers.Dense(12, activation='relu'),
         layers.Dense(4, activation='relu'),
         layers.Dense(1, activation="linear")
     ])
-    model.compile(loss="mean_squared_error",
+    model.compile(loss="mean_absolute_error",# "mean_squared_error",# "mean_squared_logarithmic_error",
                   optimizer="adam",
-                  metrics=[keras.metrics.MeanSquaredError(), keras.metrics.MeanAbsoluteError()])
+                  metrics=[keras.metrics.MeanSquaredError(),
+                           keras.metrics.MeanAbsoluteError(),
+                           keras.metrics.MeanSquaredLogarithmicError()])
     return model
 
 
 # load the data
 filename = 'lin_22_03_2022_18_27_55'
-data = np.load('data/train_' + filename + '.npy', allow_pickle=True)
+data = np.load('data/8train_' + filename + '.npy', allow_pickle=True)
 X = []
 Y = []
 for features, label in data:
@@ -54,7 +57,7 @@ model = build_and_compile_model(layers.Normalization(axis=-1))
 his = model.fit(X_train,
                 Y_train,
                 validation_split=0.2,
-                epochs=5000)
+                epochs=1000)
 model.summary()
 plot_loss(his)
 model.save(vel + "_vel_regress.model")

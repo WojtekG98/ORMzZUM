@@ -20,7 +20,7 @@ def plot_np_hist(hist, bin, fignum=None):
 if __name__ == "__main__":
     new_model = tf.keras.models.load_model('linear_vel_regress.model')
     filename = 'lin_22_03_2022_18_27_55'
-    data = np.load('data/test_' + filename + '.npy',
+    data = np.load('data/8test_' + filename + '.npy',
                    allow_pickle=True)  # training_data('raw_data/lin_02_03_2022_14_34_06.csv')
     X = []
     Y = []
@@ -43,9 +43,14 @@ if __name__ == "__main__":
     plt.show()
 
     diff = []
+    diff_sq = []
+    diff_abs = []
     for i in range(0, len(predictions)):
         diff.append(Y[i] - predictions[i])
+        diff_abs.append(abs(Y[i] - predictions[i]))
+        diff_sq.append((Y[i] - predictions[i])**2)
     hist, bins = np.histogram(diff, 100)
     plot_np_hist(hist, bins)
-    hist, bins = np.histogram(diff, 50)
-    plot_np_hist(hist, bins)
+    print(np.sum(diff_sq),np.sum(diff_abs), len(predictions))
+    # hist, bins = np.histogram(diff, 50)
+    # plot_np_hist(hist, bins)
