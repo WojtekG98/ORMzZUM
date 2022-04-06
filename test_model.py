@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+from vel_regress_train import transform_data, extension
 
 
 def plot_np_hist(hist, bin, fignum=None):
@@ -17,40 +18,40 @@ def plot_np_hist(hist, bin, fignum=None):
     plt.show()
 
 
+def save_to_file(filename, hist, bins, title=' '):
+    file = open(filename, "w")
+    file.write(title + '\n')
+    line = ' '
+    for index in range(len(hist) - 1):
+        line += str(hist[index]) + ', '
+    line += str(hist[-1]) + '\n'
+    file.write(line)
+    line = ' '
+    for index in range(len(bins) - 1):
+        line += str(bins[index]) + ', '
+    line += str(bins[-1]) + '\n'
+    file.write(line)
+    file.close()
+
+
 if __name__ == "__main__":
+    pre = 'data/8test_'
     new_model = tf.keras.models.load_model('linear_vel_regress.model')
-    filename = 'lin_22_03_2022_18_27_55'
-    data = np.load('data/8test_' + filename + '.npy',
-                   allow_pickle=True)  # training_data('raw_data/lin_02_03_2022_14_34_06.csv')
-    X = []
-    Y = []
-    for features, label in data:
-        X.append(features)
-        Y.append(label)
-    # X = keras.utils.normalize(X)  # scales data between 0 and 1
-    X = np.array(X)
-    Y = np.array(Y)
-    x_test = X
-    y_test = Y
+    data = np.load(pre + 'lin_22_03_2022_18_27_55' + extension, allow_pickle=True)
+    x_test, y_test = transform_data(data)
     print(new_model.summary())
 
     predictions = new_model.predict(x_test)
-    i = [x for x in range(0, len(predictions))]
-    plt.figure()
-    plt.plot(i, predictions, 'r.', label="predictions")
-    plt.plot(i, y_test, 'b.', label="labels")
-    plt.legend()
-    plt.show()
 
     diff = []
     diff_sq = []
     diff_abs = []
     for i in range(0, len(predictions)):
-        diff.append(Y[i] - predictions[i])
-        diff_abs.append(abs(Y[i] - predictions[i]))
-        diff_sq.append((Y[i] - predictions[i])**2)
+        diff.append(y_test[i] - predictions[i])
+        diff_abs.append(abs(y_test[i] - predictions[i]))
+        diff_sq.append((y_test[i] - predictions[i])**2)
     hist, bins = np.histogram(diff, 100)
     plot_np_hist(hist, bins)
-    print(np.sum(diff_sq),np.sum(diff_abs), len(predictions))
+    save_to_file("plot_data/predictions_lin.csv", hist, bins, "Histogram, bins:" + str(len(bins) - 1))
     # hist, bins = np.histogram(diff, 50)
     # plot_np_hist(hist, bins)
