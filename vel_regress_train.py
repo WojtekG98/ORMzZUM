@@ -19,7 +19,7 @@ def plot_loss(history):
     plt.legend()
     plt.grid(True)
     plt.show()
-    print(history.history)
+    print(history.history.keys())
 
 
 def build_and_compile_model(norm):
@@ -35,7 +35,6 @@ def build_and_compile_model(norm):
     model.compile(loss="mean_absolute_error",# "mean_squared_error",# "mean_squared_logarithmic_error",
                   optimizer="adam",
                   metrics=[keras.metrics.MeanSquaredError(),
-                           keras.metrics.MeanAbsoluteError(),
                            keras.metrics.MeanSquaredLogarithmicError()])
     return model
 
@@ -57,7 +56,7 @@ model = build_and_compile_model(layers.Normalization(axis=-1))
 his = model.fit(X_train,
                 Y_train,
                 validation_split=0.2,
-                epochs=1000)
+                epochs=10)
 model.summary()
 plot_loss(his)
 model.save(vel + "_vel_regress.model")
