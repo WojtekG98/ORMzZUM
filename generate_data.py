@@ -48,16 +48,16 @@ def training_data(file, n=2):
 
 
 if __name__ == "__main__":
-    filename = 'lin_22_03_2022_18_27_55'
-    data = training_data('raw_data/' + filename + '.csv', 2)
-    random.shuffle(data)
+    filename = 'ang_22_03_2022_18_27_55'  # 'lin_22_03_2022_18_27_55'
+    all_data = training_data('raw_data/' + filename + '.csv', 2)
+    random.shuffle(all_data)
     np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
-    test_data = np.array(data[4 * len(data) // 5:])
-    train_data = np.array(data[:4 * len(data) // 5])
+    test_data = np.array(all_data[4 * len(all_data) // 5:])
+    train_data = np.array(all_data[:4 * len(all_data) // 5])
     np.save('data/train_' + filename, train_data)
     np.save('data/test_' + filename, test_data)
-    n = 8
-    i = [x for x in range(0, N, int(N / n))]
+    num_of_samples = 8
+    i = [x for x in range(0, N, int(N / num_of_samples))]
     test_data_8 = []
     train_data_8 = []
     for item in train_data:
