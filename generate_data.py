@@ -1,11 +1,12 @@
 import csv
 import random
 import numpy as np
+from scipy import spatial
 
 N = 720
 
 
-def training_data(file, n=2):
+def training_data(file, n=2, vel="lin"):
     file = open(file)
     csvreader = csv.reader(file)
     rows = []
@@ -29,6 +30,7 @@ def training_data(file, n=2):
 
     # for i in range(0, int(len(rows) / 2)):
     i = 0
+    bits_to_roll = 1
     while i + n - 1 < len(rows):
         rows_0 = rows[i]  # rows[2 * i]
         rows_1 = rows[i + n - 1]  # rows[2 * i + 1]
@@ -36,8 +38,13 @@ def training_data(file, n=2):
         lengths_1 = rows_1[0]
         # rolled_lengths_1 = array_new = np.roll(lengths_1, 360)
         lengths_diff = []
-        for j in range(0, len(lengths_0)):
-            lengths_diff.append(lengths_1[j] - lengths_0[j])
+        if vel == "lin":
+            for j in range(0, len(lengths_0)):
+                lengths_diff.append(lengths_1[j] - lengths_0[j])
+        if vel == "ang":
+            rolled_lengths_0 = np.roll(lengths_0, bits_to_roll)
+            for j in range(0, len(lengths_0)):
+                lengths_diff.append(lengths_1[j] - rolled_lengths_0[j])
         vel_0 = rows_0[1]
         vel_1 = rows_1[1]
         vel_mean = vel_1  # (vel_0 + vel_1) / 2
@@ -49,7 +56,7 @@ def training_data(file, n=2):
 
 if __name__ == "__main__":
     filename = 'ang_22_03_2022_18_27_55'  # 'lin_22_03_2022_18_27_55'
-    all_data = training_data('raw_data/' + filename + '.csv', 2)
+    all_data = training_data('raw_data/' + filename + '.csv', 2, "ang")
     random.shuffle(all_data)
     np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
     test_data = np.array(all_data[4 * len(all_data) // 5:])

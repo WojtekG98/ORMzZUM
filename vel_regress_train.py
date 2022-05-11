@@ -52,10 +52,10 @@ def build_and_compile_model():
         layers.Normalization(axis=-1),
         layers.Dense(4, activation='relu'),
         layers.Normalization(axis=-1),
-        layers.Dense(1, activation="linear")
+        layers.Dense(1, activation="relu")
     ])
     model.compile(loss="mean_absolute_error",  # "mean_squared_error",# "mean_squared_logarithmic_error",
-                  optimizer="adam",
+                  optimizer="Adam",
                   metrics=[keras.metrics.MeanSquaredError(),
                            keras.metrics.MeanSquaredLogarithmicError()])
     return model
@@ -80,7 +80,8 @@ def train_model(vel_name, epochs_num):
     his = regression_model.fit(x_train,
                                y_train,
                                validation_split=0.2,
-                               epochs=epochs_num)
+                               epochs=epochs_num,
+                               verbose=2)
     regression_model.summary()
     plot_loss(his, "mean_absolute_error")
     regression_model.save(vel + "_vel_regress.model")
@@ -89,4 +90,4 @@ def train_model(vel_name, epochs_num):
 if __name__ == "__main__":
     vel = "ang"  # "lin"
     pre = 'data/8train_'
-    train_model(pre + vel, 500)
+    train_model(pre + vel, 250)
