@@ -41,18 +41,18 @@ def plot_loss(history, lossname):
     file.close()
 
 
-def build_and_compile_model():
+def build_and_compile_model(activation_name, output_activation_name):
     model = keras.Sequential([
         layers.Normalization(axis=-1),
-        layers.Dense(4, activation='relu'),  # kernel_regularizer=regularizers.l2(0.0001),
+        layers.Dense(4, activation=activation_name),  # kernel_regularizer=regularizers.l2(0.0001),
         layers.Normalization(axis=-1),
         # layers.Dropout(0.1),
         # layers.BatchNormalization(),
-        layers.Dense(12, activation='relu'),
+        layers.Dense(12, activation=activation_name),
         layers.Normalization(axis=-1),
-        layers.Dense(4, activation='relu'),
+        layers.Dense(4, activation=activation_name),
         layers.Normalization(axis=-1),
-        layers.Dense(1, activation="relu")
+        layers.Dense(1, activation=output_activation_name)
     ])
     model.compile(loss="mean_absolute_error",  # "mean_squared_error",# "mean_squared_logarithmic_error",
                   optimizer="Adam",
@@ -72,16 +72,18 @@ def transform_data(data):
     return x, y
 
 
-def train_model(vel_name, epochs_num):
+def train_model(vel_name, epochs_num, activation_name='relu', output_activation_name='tanh'):
     extension = '.npy'
     filename = vel_name + '_22_03_2022_18_27_55' + extension
     x_train, y_train = transform_data(np.load(filename, allow_pickle=True))
-    regression_model = build_and_compile_model()
+    regression_model = build_and_compile_model(activation_name, output_activation_name)
+    callback = keras.callbacks.EarlyStopping(monitor='val_loss', patience=100, restore_best_weights=True)
     his = regression_model.fit(x_train,
                                y_train,
                                validation_split=0.2,
                                epochs=epochs_num,
-                               verbose=2)
+                               callbacks=[callback],
+                               verbose=1)
     regression_model.summary()
     plot_loss(his, "mean_absolute_error")
     regression_model.save(vel + "_vel_regress.model")
@@ -89,5 +91,5 @@ def train_model(vel_name, epochs_num):
 
 if __name__ == "__main__":
     vel = "ang"  # "lin"
-    pre = 'data/8train_'
-    train_model(pre + vel, 250)
+    pre = 'data/8train_' #
+    train_model(pre + vel, 1500, 'tanh', 'tanh')

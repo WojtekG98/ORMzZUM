@@ -13,7 +13,7 @@ def plot_np_hist(hist, bins, fignum=None, title="Error histogram, bins:"):
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
     plt.bar(center, hist, align='center', width=width)
-    if title == "Histogram, bins:":
+    if title == "Error histogram, bins:":
         title = title + str(len(bins) - 1)
 
     plt.title(title)
@@ -37,7 +37,7 @@ def save_to_file(filename, histogram_values, bins_values, title_hist=' ', title_
 
 if __name__ == "__main__":
     pre = 'data/8test_'
-    vel = 'ang'  # 'lin
+    vel = 'ang' # 'lin'
     extension = '.npy'
     new_model = tf.keras.models.load_model(vel + '_vel_regress.model')
     data = np.load(pre + vel + '_22_03_2022_18_27_55' + extension, allow_pickle=True)
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     diff_sq = []
     diff_abs = []
     for i in range(0, len(predictions)):
-        print(predictions[i][0], y_test[i])
+        #print(predictions[i][0], y_test[i])
         diff.append(y_test[i] - predictions[i])
         diff_abs.append(abs(y_test[i] - predictions[i]))
         diff_sq.append((y_test[i] - predictions[i])**2)

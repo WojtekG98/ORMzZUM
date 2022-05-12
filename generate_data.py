@@ -73,5 +73,7 @@ if __name__ == "__main__":
     for item in test_data:
         x = [item[0][index] for index in i]
         test_data_8.append((x, item[1]))
+    #print(train_data_8)
+    #print(test_data_8)
     np.save('data/8train_' + filename, train_data_8)
     np.save('data/8test_' + filename, test_data_8)
