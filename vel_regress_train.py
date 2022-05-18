@@ -90,6 +90,6 @@ def train_model(vel_name, epochs_num, activation_name='relu', output_activation_
 
 
 if __name__ == "__main__":
-    vel = "lin" # 'ang' 'tanh' 'tanh'
-    pre = 'data/8train_' #
-    train_model(pre + vel, 5000, 'relu', 'linear')
+    vel = 'ang' # 'tanh' 'tanh'
+    pre = 'data/train_' #
+    train_model(pre + vel, 2500, 'tanh', 'tanh')

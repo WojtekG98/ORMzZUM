@@ -37,8 +37,8 @@ def save_to_file(filename, histogram_values, bins_values, title_hist=' ', title_
 
 
 if __name__ == "__main__":
-    pre = 'data/8test_'
-    vel = 'lin'  # 'ang'
+    pre = 'data/test_'
+    vel = 'ang'  # 'lin'
     extension = '.npy'
     new_model = tf.keras.models.load_model(vel + '_vel_regress.model')
     data = np.load(pre + vel + '_22_03_2022_18_27_55' + extension, allow_pickle=True)
@@ -73,7 +73,5 @@ if __name__ == "__main__":
     save_to_file(name_predictions, hist, bins, "Histogram, ", "bins:" + str(len(bins) - 1)+",")
     hist, bins = np.histogram(predictions, 100)
     plot_np_hist(hist, bins, None, "Estymowane prędkości")
-    hist, bins = np.histogram(diff, 50)
-    plot_np_hist(hist, bins)
     hist, bins = np.histogram(y_test, 100)
     plot_np_hist(hist, bins, None, "Rzeczywiste prędkości")
