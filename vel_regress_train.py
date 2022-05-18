@@ -77,7 +77,7 @@ def train_model(vel_name, epochs_num, activation_name='relu', output_activation_
     filename = vel_name + '_22_03_2022_18_27_55' + extension
     x_train, y_train = transform_data(np.load(filename, allow_pickle=True))
     regression_model = build_and_compile_model(activation_name, output_activation_name)
-    callback = keras.callbacks.EarlyStopping(monitor='val_loss', patience=100, restore_best_weights=True)
+    callback = keras.callbacks.EarlyStopping(monitor='val_loss', patience=250, restore_best_weights=True)
     his = regression_model.fit(x_train,
                                y_train,
                                validation_split=0.2,
@@ -90,6 +90,6 @@ def train_model(vel_name, epochs_num, activation_name='relu', output_activation_
 
 
 if __name__ == "__main__":
-    vel = "ang"  # "lin"
+    vel = "lin" # 'ang' 'tanh' 'tanh'
     pre = 'data/8train_' #
-    train_model(pre + vel, 1500, 'tanh', 'tanh')
+    train_model(pre + vel, 5000, 'relu', 'linear')
