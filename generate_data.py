@@ -6,7 +6,7 @@ from scipy import spatial
 N = 720
 
 
-def training_data(file, n=2, vel="lin"):
+def training_data(file, vel="lin", bits_to_roll=20):
     file = open(file)
     csvreader = csv.reader(file)
     rows = []
@@ -28,15 +28,12 @@ def training_data(file, n=2, vel="lin"):
         rows.pop()
     data = []
 
-    # for i in range(0, int(len(rows) / 2)):
-    i = 0
-    bits_to_roll = 1
-    while i + n - 1 < len(rows):
+
+    for i in range(0, len(rows) - 1, 1):
         rows_0 = rows[i]  # rows[2 * i]
-        rows_1 = rows[i + n - 1]  # rows[2 * i + 1]
+        rows_1 = rows[i + 1]  # rows[2 * i + 1]
         lengths_0 = rows_0[0]
         lengths_1 = rows_1[0]
-        # rolled_lengths_1 = array_new = np.roll(lengths_1, 360)
         lengths_diff = []
         if vel == "lin":
             for j in range(0, len(lengths_0)):
@@ -49,31 +46,38 @@ def training_data(file, n=2, vel="lin"):
         vel_1 = rows_1[1]
         vel_mean = vel_1  # (vel_0 + vel_1) / 2
         data.append([lengths_diff, vel_mean])
-        i += n
     print(len(rows), len(data))
     return data
 
 
 if __name__ == "__main__":
-    filename = 'ang_22_03_2022_18_27_55'  # 'lin_22_03_2022_18_27_55'
-    all_data = training_data('raw_data/' + filename + '.csv', 2, "ang")
-    random.shuffle(all_data)
-    np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
-    test_data = np.array(all_data[4 * len(all_data) // 5:])
-    train_data = np.array(all_data[:4 * len(all_data) // 5])
-    np.save('data/train_' + filename, train_data)
-    np.save('data/test_' + filename, test_data)
-    num_of_samples = 8
-    i = [x for x in range(0, N, int(N / num_of_samples))]
-    test_data_8 = []
-    train_data_8 = []
-    for item in train_data:
-        x = [item[0][index] for index in i]
-        train_data_8.append((x, item[1]))
-    for item in test_data:
-        x = [item[0][index] for index in i]
-        test_data_8.append((x, item[1]))
-    #print(train_data_8)
-    #print(test_data_8)
-    np.save('data/8train_' + filename, train_data_8)
-    np.save('data/8test_' + filename, test_data_8)
+    workspace_path = 'raw_data/room_to_room_saved_data/'
+    save_path = 'room_to_room/data/'
+    vels = ("ang", "lin")
+    split = False
+    for vel in vels:
+        filename = workspace_path + vel + '.csv'
+        all_data = training_data(filename, vel, 1)
+        np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
+        num_of_samples = 8
+        i = [x for x in range(0, N, int(N / num_of_samples))]
+        if split:
+            random.shuffle(all_data)
+            test_data = np.array(all_data[4 * len(all_data) // 5:])
+            train_data = np.array(all_data[:4 * len(all_data) // 5])
+            test_data_8 = []
+            train_data_8 = []
+            for item in train_data:
+                x = [item[0][index+10] for index in i]
+                train_data_8.append((x, item[1]))
+            for item in test_data:
+                x = [item[0][index+10] for index in i]
+                test_data_8.append((x, item[1]))
+            np.save(save_path + '8train_'+vel+'.npy', train_data_8)
+            np.save(save_path + '8test_'+vel+'.npy', test_data_8)
+        else:
+            all_data8 = []
+            for item in all_data:
+                x = [item[0][index] for index in i]
+                all_data8.append((x, item[1]))
+            np.save(save_path + '8' + vel + '.npy', all_data8)

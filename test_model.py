@@ -6,7 +6,7 @@ from vel_regress_train import transform_data
 from keras.utils.vis_utils import plot_model
 
 
-def plot_np_hist(hist, bins, fignum=None, title="Error histogram, bins:"):
+def plot_np_hist(hist, bins, fignum=None):
     if fignum is not None:
         plt.figure(fignum)
     else:
@@ -14,14 +14,10 @@ def plot_np_hist(hist, bins, fignum=None, title="Error histogram, bins:"):
     width = 0.7 * (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
     plt.bar(center, hist, align='center', width=width)
-    if title == "Error histogram, bins:":
-        title = title + str(len(bins) - 1)
-
-    plt.title(title)
     plt.show()
 
 
-def save_to_file(filename, histogram_values, bins_values, title_hist=' ', title_bins=' '):
+def save_to_file(filename, histogram_values, bins_values, title_hist=' ', title_bins=' ', diffs=[]):
     file = open(filename, "w")
     line = title_hist
     for index in range(len(histogram_values) - 1):
@@ -33,19 +29,15 @@ def save_to_file(filename, histogram_values, bins_values, title_hist=' ', title_
         line += str(bins_values[index]) + ', '
     line += str(bins_values[-1]) + '\n'
     file.write(line)
+    line = ''.join([str(x[0]) + ", " for x in diffs])
+    file.write("diffs, " + line)
     file.close()
 
 
-if __name__ == "__main__":
-    pre = 'data/test_'
-    vel = 'ang'  # 'lin'
-    extension = '.npy'
-    new_model = tf.keras.models.load_model(vel + '_vel_regress.model')
-    data = np.load(pre + vel + '_22_03_2022_18_27_55' + extension, allow_pickle=True)
-    x_test, y_test = transform_data(data)
+def plot_the_model(_model, _filename):
     plot_model(
-        new_model,
-        to_file=vel + '_vel_regress_model.png',
+        _model,
+        to_file=_filename,
         show_shapes=True,
         show_dtype=False,
         show_layer_names=False,
@@ -55,23 +47,29 @@ if __name__ == "__main__":
         layer_range=None,
         show_layer_activations=True,
     )
-    #print(new_model.summary())
 
+
+if __name__ == "__main__":
+    workspace_path = 'rolled_20/'
+    pre = 'rolled_20/data/8test_'
+    vel = 'ang'  # lin or ang
+    model_filename = workspace_path + vel + '_vel_regress.model'
+    saved_filename = workspace_path + vel + '_error_histogram_data.csv'
+    new_model = tf.keras.models.load_model(model_filename)
+    x_test, y_test = transform_data(np.load(pre + vel + '.npy', allow_pickle=True))
+    #plot_the_model(new_model, vel + '_vel_regress_model.png')
     predictions = new_model.predict(x_test)
-
     diff = []
-    diff_sq = []
-    diff_abs = []
     for i in range(0, len(predictions)):
-        #print(predictions[i][0], y_test[i])
         diff.append(y_test[i] - predictions[i])
-        diff_abs.append(abs(y_test[i] - predictions[i]))
-        diff_sq.append((y_test[i] - predictions[i])**2)
     hist, bins = np.histogram(diff, 100)
     plot_np_hist(hist, bins)
-    name_predictions = "plot_data/predictions_" + vel + ".csv"
-    save_to_file(name_predictions, hist, bins, "Histogram, ", "bins:" + str(len(bins) - 1)+",")
+    save_to_file(saved_filename, hist, bins, "Histogram, ", "bins, ", diff)
     hist, bins = np.histogram(predictions, 100)
-    plot_np_hist(hist, bins, None, "Estymowane prędkości")
+    plot_np_hist(hist, bins)
     hist, bins = np.histogram(y_test, 100)
-    plot_np_hist(hist, bins, None, "Rzeczywiste prędkości")
+    plot_np_hist(hist, bins)
+    #file = open('data/osemki/'+vel+'_list.csv', "w")
+    #line = ''.join([str(x[0]) + ", " for x in predictions])
+    #file.write("predictions, " + line)
+    #file.close()
